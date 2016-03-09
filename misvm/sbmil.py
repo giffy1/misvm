@@ -13,7 +13,7 @@ class sbMIL(SIL):
     Sparse, balanced MIL (Bunescu & Mooney, 2007)
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         """
         @param kernel : the desired kernel function; can be linear, quadratic,
                         polynomial, or rbf [default: linear]
@@ -30,12 +30,17 @@ class sbMIL(SIL):
         @param verbose : print optimization status messages [default: True]
         @param sv_cutoff : the numerical cutoff for an example to be considered
                            a support vector [default: 1e-7]
-        @param eta : balance parameter
+        @param class_weight : dict, optional
+                           Set the parameter C of class i to class_weight[i]*C for
+                           SVC. If not given, all classes are supposed to have
+                           weight one.
+        @param eta : balancing parameter [default: 0.0]
         """
-        self.eta = kwargs.pop('eta', 0.0)
-        self.eta = max(0.0, self.eta)
-        self.eta = min(1.0, self.eta)
-        super(sbMIL, self).__init__(*args, **kwargs)
+        #self.eta = kwargs.pop('eta', 0.3)
+        #self.eta = max(0.0, self.eta)
+        #self.eta = min(1.0, self.eta)
+        super(sbMIL, self).__init__(**kwargs)
+        #super(sbMIL, self).__init__(*args, **kwargs)
 
     def fit(self, bags, y):
         """
@@ -51,7 +56,7 @@ class sbMIL(SIL):
             print 'Training initial sMIL classifier for sbMIL...'
         initial_classifier = sMIL(kernel=self.kernel, C=self.C, p=self.p, gamma=self.gamma,
                                   scale_C=self.scale_C, verbose=self.verbose,
-                                  sv_cutoff=self.sv_cutoff)
+                                  sv_cutoff=self.sv_cutoff, class_weight = self.class_weight)
         initial_classifier.fit(bags, y)
         if self.verbose:
             print 'Computing initial instance labels for sbMIL...'

@@ -12,7 +12,7 @@ class SIL(SVM):
     Single-Instance Learning applied to MI data
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
         @param kernel : the desired kernel function; can be linear, quadratic,
                         polynomial, or rbf [default: linear]
@@ -25,8 +25,12 @@ class SIL(SVM):
         @param verbose : print optimization status messages [default: True]
         @param sv_cutoff : the numerical cutoff for an example to be considered
                            a support vector [default: 1e-7]
+        @param class_weight : dict, optional
+                           Set the parameter C of class i to class_weight[i]*C for
+                           SVC. If not given, all classes are supposed to have
+                           weight one.
         """
-        super(SIL, self).__init__(**kwargs)
+        super(SIL, self).__init__(*args, **kwargs)
         self._bags = None
         self._bag_predictions = None
 
@@ -41,7 +45,7 @@ class SIL(SVM):
         svm_X = np.vstack(self._bags)
         svm_y = np.vstack([float(cls) * np.matrix(np.ones((len(bag), 1)))
                            for bag, cls in zip(self._bags, y)])
-        super(SIL, self).fit(svm_X, svm_y)
+        return super(SIL, self).fit(svm_X, svm_y)
 
     def _compute_separator(self, K):
         super(SIL, self)._compute_separator(K)

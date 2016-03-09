@@ -31,6 +31,10 @@ class sMIL(NSK):
         @param verbose : print optimization status messages [default: True]
         @param sv_cutoff : the numerical cutoff for an example to be considered
                            a support vector [default: 1e-7]
+        @param class_weight : dict, optional
+                           Set the parameter C of class i to class_weight[i]*C for
+                           SVC. If not given, all classes are supposed to have
+                           weight one.
         """
         super(sMIL, self).__init__(*args, **kwargs)
 
@@ -53,7 +57,7 @@ class sMIL(NSK):
             bC = self.C
         C = np.vstack([iC * np.ones((bs.L_n, 1)),
                        bC * np.ones((bs.X_p, 1))])
-
+																							
         if self.verbose:
             print 'Setup QP...'
         K, H, f, A, b, lb, ub = self._setup_svm(self._bags, self._y, C)
@@ -72,3 +76,4 @@ class sMIL(NSK):
 
         # Recompute predictions for full bags
         self._bag_predictions = self.predict(bags)
+        return self
