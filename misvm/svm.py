@@ -14,7 +14,7 @@ class SVM(ClassifierMixin, BaseEstimator):
     """
 
     def __init__(self, kernel='linear', C=1.0, p=3, gamma=1e0, scale_C=True,
-                 verbose=True, sv_cutoff=1e-7):
+                 verbose=True, sv_cutoff=1e-7, class_weight=None):
         """
         @param kernel : the desired kernel function; can be linear, quadratic,
                         polynomial, or rbf [default: linear]
@@ -27,6 +27,10 @@ class SVM(ClassifierMixin, BaseEstimator):
         @param verbose : print optimization status messages [default: True]
         @param sv_cutoff : the numerical cutoff for an example to be considered
                            a support vector [default: 1e-7]
+        @param class_weight : dict, optional
+                           Set the parameter C of class i to class_weight[i]*C. 
+                           If not given, all classes are supposed to have
+                           weight one.
         """
         self.kernel = kernel
         self.C = C
@@ -35,6 +39,7 @@ class SVM(ClassifierMixin, BaseEstimator):
         self.scale_C = scale_C
         self.verbose = verbose
         self.sv_cutoff = sv_cutoff
+        self.class_weight = class_weight
 
         self._X = None
         self._y = None
@@ -59,6 +64,18 @@ class SVM(ClassifierMixin, BaseEstimator):
             C = self.C / float(len(self._X))
         else:
             C = self.C
+        
+        if type(C) == float or type(C) == np.float64:
+            #if C is a float, set to an array with each value equal to C
+            weighted_C = C * np.matrix(np.ones((len(X), 1)))
+        else:
+            #if user provides C as an array-like object
+            weighted_C = C
+        
+        #update C according to class weights if specified
+        if self.class_weight != None:
+            for k in xrange(len(X)):
+                weighted_C[k] *= self.class_weight.get(y.item(k), 1.0)
 
         K, H, f, A, b, lb, ub = self._setup_svm(self._X, self._y, C)
 
@@ -66,6 +83,7 @@ class SVM(ClassifierMixin, BaseEstimator):
         self._alphas, self._objective = quadprog(H, f, A, b, lb, ub,
                                                  self.verbose)
         self._compute_separator(K)
+        return self
 
     def _compute_separator(self, K):
 
