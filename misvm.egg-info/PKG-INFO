@@ -1,0 +1,14 @@
+Metadata-Version: 1.1
+Name: misvm
+Version: 1.0
+Summary: 
+          Implementations of various
+          multiple-instance support vector machine approaches
+          
+Home-page: https://github.com/garydoranjr/misvm.git
+Author: Gary Doran
+Author-email: gary.doran@case.edu
+License: BSD compatable (see the LICENSE file)
+Description: UNKNOWN
+Platform: unix
+Provides: misvm
