@@ -79,4 +79,4 @@ class sbMIL(SIL):
 
     def _compute_separator(self, K):
         super(SIL, self)._compute_separator(K)
-        self._bag_predictions = self.predict(self._bags)
+#        self._bag_predictions = self.predict(self._bags)
